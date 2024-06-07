@@ -14,6 +14,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "request": "^2.88.2",
     "path": "^0.12.7",
     "fuse.js": "^7.0.0",
     "fontstyles": "^1.0.5",

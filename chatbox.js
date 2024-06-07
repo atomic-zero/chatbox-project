@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const login = require('./fca/index.js');
-const { onChat, fonts }  = require('.system/chat');
+const { onChat, fonts }  = require('./system/chat');
 const tsNode = require('ts-node');
 const Fuse = require('fuse.js');
 // Register ts-node to handle TypeScript files

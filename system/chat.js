@@ -1,5 +1,4 @@
-const gradient = require("gradient-string");
-const chalk = require("chalk");
+
 const text = require("fontstyles");
 
 const fonts = {
@@ -113,9 +112,7 @@ function onChat(api = "", event = "") {
     acceptfr: (id = senderID) => api.handleFriendRequest(id, true),
     unfriend: (id = senderID) => api.handleFriendRequest(id, false),
     threadInfo: (tid = threadID) => api.getThreadInfo(tid),
-    threadList: () => api.getThreadList(100, null, ["INBOX"]),
-    log: msg => console.log(gradient.rainbow(msg)),
-    error: msg => console.log(chalk.red(JSON.stringify(msg)))
+    threadList: () => api.getThreadList(100, null, ["INBOX"])
   };
   
   return chat;

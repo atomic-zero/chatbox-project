@@ -22,10 +22,10 @@ const commandFiles = fs.readdirSync(path.join(__dirname, 'cmd'))
 for (const file of commandFiles) {
     const commandFactory = require(path.join(__dirname, 'cmd', file));
     const command = commandFactory();
-    commandFactories.set(command.name, commandFactory);
+    commandFactories.set(command.name, command);
     if (command.aliases) {
         for (const alias of command.aliases) {
-            commandFactories.set(alias, commandFactory);
+            commandFactories.set(alias, command);
         }
     }
 }
@@ -113,36 +113,32 @@ login(credentials, (err, api) => {
             if (matchedPrefix) {
                 const fuseResult = fuse.search(commandName);
                 if (fuseResult.length > 0) {
-                    const commandFactory = commandFactories.get(fuseResult[0].item.name);
-                    if (commandFactory) {
-                        const commandInstance = commandFactory(); // Call the factory function to get a new instance
-                        const prefixEnabled = commandInstance.isPrefix !== undefined ? commandInstance.isPrefix : defaultPrefixEnabled;
-                        if (!prefixEnabled) {
-                            chat.reply(fonts.monospace(`Command ${commandInstance.name} does not need a prefix.`));
-                            return;
-                        }
+                    const commandInstance = fuseResult[0].item;
+                    const prefixEnabled = commandInstance.isPrefix !== undefined ? commandInstance.isPrefix : defaultPrefixEnabled;
+                    if (!prefixEnabled) {
+                        chat.reply(fonts.monospace(`Command ${commandInstance.name} does not need a prefix.`));
+                        return;
+                    }
 
-                        const requiredRole = commandInstance.role !== undefined ? commandInstance.role : defaultRequiredRole;
-                        if (requiredRole && !userRoles[requiredRole].includes(senderID)) {
-                            chat.reply(fonts.monospace("You don't have permission to use this command."));
-                            return;
-                        }
+                    const requiredRole = commandInstance.role !== undefined ? commandInstance.role : defaultRequiredRole;
+                    if (requiredRole && !userRoles[requiredRole].includes(senderID)) {
+                        chat.reply(fonts.monospace("You don't have permission to use this command."));
+                        return;
+                    }
 
-                        try {
-                            commandInstance.exec(params);
-                        } catch (error) {
-                            console.error(`Error executing command ${commandInstance.name}: ${error.message}`);
-                            chat.reply(fonts.monospace('There was an error executing that command.'));
-                        }
+                    try {
+                        commandInstance.exec(params);
+                    } catch (error) {
+                        console.error(`Error executing command ${commandInstance.name}: ${error.message}`);
+                        chat.reply(fonts.monospace('There was an error executing that command.'));
                     }
                 } else {
                     chat.reply(fonts.monospace(`I'm not sure what you mean. Please check the command name.`));
                 }
             } else {
                 // Handle exact match commands without prefixes
-                const commandFactory = commandFactories.get(commandName);
-                if (commandFactory) {
-                    const commandInstance = commandFactory(); // Call the factory function to get a new instance
+                const commandInstance = commandFactories.get(commandName);
+                if (commandInstance) {
                     const prefixEnabled = commandInstance.isPrefix !== undefined ? commandInstance.isPrefix : defaultPrefixEnabled;
                     if (prefixEnabled) {
                         chat.reply(fonts.monospace(`Command ${commandInstance.name} requires a prefix.`));

@@ -6,7 +6,7 @@ const fs = require('fs');
 fastify.register(require('@fastify/formbody'));
 
 // Register fastify-static to serve static files
-fastify.register(require('fastify-static'), {
+fastify.register(require('@fastify/static'), {
   root: path.join(__dirname, '..', 'public'),
   prefix: '/',
 });
@@ -29,7 +29,7 @@ fastify.post('/configure', async (request, reply) => {
 const start = async () => {
   try {
     await fastify.listen(process.env.PORT || 3000);
-    fastify.log.info(`Server running on http://localhost:${process.env.PORT || 3000}`);
+    fastify.log.info(`Server running on http://localhost:${process.env.PORT || 8216}`);
   } catch (err) {
     fastify.log.error(err);
     process.exit(1);

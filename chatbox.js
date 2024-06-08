@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const login = require('./fca/index.js');
 const { onChat, fonts }  = require('./system/chat');
+var mono = txt => fons.monospace(txt);
 const tsNode = require('ts-node');
 const Fuse = require('fuse.js');
 
@@ -70,37 +71,36 @@ login(credentials, (err, api) => {
 
         if (event.body) {
             const chat = new onChat(api, event);
-            const output = chat;  // alias for chat
-            const box = chat;  // another alias for chat
+            var output, box, message = chat;  // alias for chat
 
-            // List of prefixes
+            // List of prefixes 
             const prefixes = ['!', '?', '/'];
 
-            // Find the prefix
+            // Find the prefix that is used in the body then proceeds to execute command with prefix 
             const matchedPrefix = prefixes.find(p => event.body.startsWith(p));
 
-            // Check if the message is asking for the prefix
+            // Check the message body if asking for the prefix
             if (event.body.toLowerCase() === 'prefix') {
                 if (prefixes) {
-                    chat.reply(`The prefix of the bot is: ${JSON.stringify(prefixes)}`);
+                    chat.reply(mono(`The prefix of the bot is: ${JSON.stringify(prefixes)}`));
                 } else {
-                    chat.reply("I'm sorry, but the bot doesn't have a prefix.");
+                    chat.reply(mono("I'm sorry, but the bot doesn't have a prefix."));
                 }
                 return;
             }
 
-            // Check if there is a matched prefix
+            // Check if there is a matched prefix of the command
             if (matchedPrefix) {
                 // Remove prefix and trim the command body
                 const commandBody = event.body.slice(matchedPrefix.length).trim();
 
-                // Search for command
+                // execute closer command name only works with prefix!
                 const fuseResult = fuse.search(commandBody);
                 if (fuseResult.length > 0) {
                     // Execute the closest matched command
                     const command = fuseResult[0].item; // Get the closest matched command
 
-                    // Check if the command supports prefixes
+                    // Check if the command supports prefixes : >
                     const prefixEnabled = command.isPrefix !== undefined ? command.isPrefix : defaultPrefixEnabled;
                     if (!prefixEnabled) {
                         console.error(`Command ${command.name} does not support prefixes.`);
@@ -110,7 +110,7 @@ login(credentials, (err, api) => {
                     // Check if the user has the required role to execute the command
                     const requiredRole = command.role !== undefined ? command.role : defaultRequiredRole;
                     if (requiredRole && !userRoles[requiredRole].includes(event.senderID)) {
-                        chat.reply("You don't have permission to use this command.");
+                        chat.reply(mono("You don't have permission to use this command."));
                         return;
                     }
 
@@ -123,11 +123,11 @@ login(credentials, (err, api) => {
                         command.exec(params);
                     } catch (error) {
                         console.error(`Error executing command ${command.name}: ${error.message}`);
-                        chat.reply('There was an error executing that command.');
+                        chat.reply(mono('There was an error executing that command.'));
                     }
                 } else {
                     const closestCommands = fuseResult.map(result => result.item.name);
-                    chat.reply(`I'm not sure what you mean. Did you mean ${closestCommands.join(', ')}?`);
+                    chat.reply(mono(`I'm not sure what you mean. Did you mean ${closestCommands.join(', ')}?`));
                 }
             } else {
                 // No prefix matched, do nothing

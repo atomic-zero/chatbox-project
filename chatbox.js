@@ -100,26 +100,30 @@ login(credentials, (err, api) => {
                     // Execute the closest matched command
                     const command = fuseResult[0].item; // Get the closest matched command
 
-                    // Check if the command supports prefixes : >
+                    // Check if the command supports prefixes
                     const prefixEnabled = command.isPrefix !== undefined ? command.isPrefix : defaultPrefixEnabled;
-  
-                    const requiredRole = command.role !== undefined ? command.role : defaultRequiredRole;
-                    if (requiredRole && !userRoles[requiredRole].includes(event.senderID)) {
-                        chat.reply(mono("You don't have permission to use this command."));
-                        return;
-                    }
 
-                    // arguments for the command execution
-                    const args = commandBody.split(/\s+/).slice(1);
-                    let input = args;// alias of arguments
-                    const params = { api, chat, event, args, input, output, box, fonts };
+                    if (prefixEnabled) {
+                        const requiredRole = command.role !== undefined ? command.role : defaultRequiredRole;
+                        if (requiredRole && !userRoles[requiredRole].includes(event.senderID)) {
+                            chat.reply(mono("You don't have permission to use this command."));
+                            return;
+                        }
 
-                    // Execute the command
-                    try {
-                        command.exec(params);
-                    } catch (error) {
-                        console.error(`Error executing command ${command.name}: ${error.message}`);
-                        chat.reply(mono('There was an error executing that command.'));
+                        // arguments for the command execution
+                        const args = commandBody.split(/\s+/).slice(1);
+                        let input = args;// alias of arguments
+                        const params = { api, chat, event, args, input, output, box, fonts };
+
+                        // Execute the command
+                        try {
+                            command.exec(params);
+                        } catch (error) {
+                            console.error(`Error executing command ${command.name}: ${error.message}`);
+                            chat.reply(mono('There was an error executing that command.'));
+                        }
+                    } else {
+                        chat.reply(mono("You can't use this command without a prefix."));
                     }
                 } else {
                     const closestCommands = fuseResult.map(result => result.item.name);

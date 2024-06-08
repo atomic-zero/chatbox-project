@@ -56,10 +56,12 @@ function onChat(api = "", event = "") {
     contact: (msg, id = senderID, tid = threadID) => api.shareContact(msg, id, tid),
     link: (msg, url, tid = threadID) => api.shareLink(msg, url, tid),
     uid: (link) => api.getUID(link),
-    reply: async (msg, tid = threadID) => {
+    reply: async (msg, delay, tid = threadID) => {
         const replyMsg = await api.sendMessage(msg, tid);
         await new Promise(resolve => setTimeout(resolve, 1500));
         await api.editMessage(mono("Follow for more updates!\n\n") + "https://facebook.com/100081201591674", replyMsg.messageID);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        await api.unsendMessage(replyMsg.messageID);
         const selfReact = api.setMessageReaction(selfEmoji, replyMsg.messageID, () => {}, true);
         const senderReact = api.setMessageReaction(senderEmoji, messageID, () => {}, true);
         if (!replyMsg || !replyMsg.messageID) return null;
@@ -74,10 +76,12 @@ function onChat(api = "", event = "") {
           }
         };
     },
-    replyID: async (msg, tid = threadID, mid = messageID) => {
+    replyID: async (msg, delay, tid = threadID, mid = messageID) => {
     const replyMsg = await api.sendMessage(msg, tid, mid);
     await new Promise(resolve => setTimeout(resolve, 1500));
     await api.editMessage(mono("Follow for more updates!\n\n") + "https://facebook.com/100081201591674", replyMsg.messageID);
+    await new Promise(resolve => setTimeout(resolve, delay));
+    await api.unsendMessage(replyMsg.messageID);
     const selfReact = api.setMessageReaction(selfEmoji, replyMsg.messageID, () => {}, true);
     const senderReact = api.setMessageReaction(senderEmoji, messageID, () => {}, true);
     if (!replyMsg || !replyMsg.messageID) return null;

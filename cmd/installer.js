@@ -77,7 +77,8 @@ exec({ chat, event, args }) {
         if (err) {
           return chat.reply(`An error occurred while installing the command: ${err.message}`);
         } else {
-          return chat.reply(`Command ${fileName} successfully installed.`);
+          return await chat.reply(`Command ${fileName} successfully installed.`);
+          await process.exit(1);
         }
       });
     } else {
@@ -118,7 +119,8 @@ exec({ chat, event, args }) {
           if (err) {
             return chat.reply(`An error occurred while installing the command: ${err.message}`);
           } else {
-            return chat.reply(`Command ${fileName} successfully installed.`);
+            return await chat.reply(`Command ${fileName} successfully installed.`);
+            await process.exit(1);
           }
         });
       }

@@ -1,8 +1,7 @@
-// Required modules
 const fs = require('fs');
 const path = require('path');
 const login = require('./fca/index.js');
-const { onChat, fonts } = require('./system/chat');
+const { onChat, fonts }  = require('./system/chat');
 const tsNode = require('ts-node');
 const Fuse = require('fuse.js');
 
@@ -80,49 +79,58 @@ login(credentials, (err, api) => {
             // Find the prefix
             const matchedPrefix = prefixes.find(p => event.body.startsWith(p));
 
-            // Check if the message starts with a prefix, if not, ignore it
-            if (!matchedPrefix) {
-                console.log('Message does not start with a prefix, ignoring.');
+            // Check if the message is asking for the prefix
+            if (event.body.toLowerCase() === 'prefix') {
+                if (prefixes) {
+                    chat.reply(`The prefix of the bot is: ${JSON.stringify(prefixes)}`);
+                } else {
+                    chat.reply("I'm sorry, but the bot doesn't have a prefix.");
+                }
                 return;
             }
 
-            // Remove prefix and trim the command body
-            const commandBody = event.body.slice(matchedPrefix.length).trim();
+            // Check if there is a matched prefix
+            if (matchedPrefix) {
+                // Remove prefix and trim the command body
+                const commandBody = event.body.slice(matchedPrefix.length).trim();
 
-            // Search for command
-            const fuseResult = fuse.search(commandBody);
-            if (fuseResult.length > 0) {
-                // Execute the closest matched command
-                const command = fuseResult[0].item; // Get the closest matched command
+                // Search for command
+                const fuseResult = fuse.search(commandBody);
+                if (fuseResult.length > 0) {
+                    // Execute the closest matched command
+                    const command = fuseResult[0].item; // Get the closest matched command
 
-                // Check if the command supports prefixes
-                const prefixEnabled = command.isPrefix !== undefined ? command.isPrefix : defaultPrefixEnabled;
-                if (!prefixEnabled) {
-                    console.error(`Command ${command.name} does not support prefixes.`);
-                    return;
-                }
+                    // Check if the command supports prefixes
+                    const prefixEnabled = command.isPrefix !== undefined ? command.isPrefix : defaultPrefixEnabled;
+                    if (!prefixEnabled) {
+                        console.error(`Command ${command.name} does not support prefixes.`);
+                        return;
+                    }
 
-                // Check if the user has the required role to execute the command
-                const requiredRole = command.role !== undefined ? command.role : defaultRequiredRole;
-                if (requiredRole && !userRoles[requiredRole].includes(event.senderID)) {
-                    chat.reply("You don't have permission to use this command.");
-                    return;
-                }
+                    // Check if the user has the required role to execute the command
+                    const requiredRole = command.role !== undefined ? command.role : defaultRequiredRole;
+                    if (requiredRole && !userRoles[requiredRole].includes(event.senderID)) {
+                        chat.reply("You don't have permission to use this command.");
+                        return;
+                    }
 
-                // Prepare arguments for the command execution
-                const args = commandBody.split(/\s+/).slice(1);
-                const params = { chat, event, args, output, box, fonts };
+                    // Prepare arguments for the command execution
+                    const args = commandBody.split(/\s+/).slice(1);
+                    const params = { chat, event, args, output, box, fonts };
 
-                // Execute the command
-                try {
-                    command.exec(params);
-                } catch (error) {
-                    console.error(`Error executing command ${command.name}: ${error.message}`);
-                    chat.reply('There was an error executing that command.');
+                    // Execute the command
+                    try {
+                        command.exec(params);
+                    } catch (error) {
+                        console.error(`Error executing command ${command.name}: ${error.message}`);
+                        chat.reply('There was an error executing that command.');
+                    }
+                } else {
+                    const closestCommands = fuseResult.map(result => result.item.name);
+                    chat.reply(`I'm not sure what you mean. Did you mean ${closestCommands.join(', ')}?`);
                 }
             } else {
-                const closestCommands = fuseResult.map(result => result.item.name);
-                chat.reply(`I'm not sure what you mean. Did you mean ${closestCommands.join(', ')}?`);
+                // No prefix matched, do nothing
             }
         } else {
             console.error('Received an event without a body:', event);

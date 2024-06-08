@@ -116,7 +116,7 @@ login(credentials, (err, api) => {
 
                     // Prepare arguments for the command execution
                     const args = commandBody.split(/\s+/).slice(1);
-                    const params = { chat, event, args, output, box, fonts };
+                    const params = { api, chat, event, args, output, box, fonts };
 
                     // Execute the command
                     try {

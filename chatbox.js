@@ -70,22 +70,23 @@ login(credentials, (err, api) => {
 
         if (event.body) {
             const chat = new onChat(api, event);
-            const message = event.body.trim();
+            var box, output, atomic, message = chat;
+            const messageBody = event.body.trim();
 
             // List of prefixes 
             const prefixes = ['!', '?', '/'];
 
             // Find the prefix that is used in the body then proceeds to execute command with prefix 
-            const matchedPrefix = prefixes.find(p => message.startsWith(p));
+            const matchedPrefix = prefixes.find(p => messageBody.startsWith(p));
 
-            if (message.toLowerCase() === 'prefix') {
+            if (messageBody.toLowerCase() === 'prefix') {
                 chat.reply(fonts.monospace(`The prefixes of the bot are: ${JSON.stringify(prefixes)}`));
                 return;
             }
 
-            let commandBody = message;
+            let commandBody = messageBody;
             if (matchedPrefix) {
-                commandBody = message.slice(matchedPrefix.length).trim();
+                commandBody = messageBody.slice(matchedPrefix.length).trim();
             }
 
             const args = commandBody.split(/\s+/);

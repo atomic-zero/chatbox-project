@@ -60,12 +60,13 @@ function onChat(api = "", event = "") {
         const senderReact = api.setMessageReaction(senderEmoji, messageID, () => {}, true);
         if (!replyMsg || !replyMsg.messageID) return null;
         return {
-          edit: async (message, delay = 5) => {
-              await new Promise(resolve => setTimeout(resolve, 1));
-              await api.editMessage("© ᵃᵗᵒᵐⁱᶜ ˢˡᵃˢʰ ˢᵗᵘᵈⁱᵒ", replyMsg.messageID);
-              await new Promise(resolve => setTimeout(resolve, delay));
-              await api.editMessage(message, replyMsg.messageID);
-          },
+          edit: async (message, delay = 2) => {
+    await Promise.resolve(); // Wait for microtask queue to clear
+    await new Promise(resolve => setTimeout(resolve, delay)); // Wait for the specified delay
+    await api.editMessage("© ᵃᵗᵒᵐⁱᶜ ˢˡᵃˢʰ ˢᵗᵘᵈⁱᵒ", replyMsg.messageID);
+    await api.editMessage(message, replyMsg.messageID);
+},
+
           unsend: async (delay = 0) => {
             await new Promise(resolve => setTimeout(resolve, delay));
             await api.unsendMessage(replyMsg.messageID);

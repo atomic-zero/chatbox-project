@@ -28,7 +28,7 @@ commandFiles.forEach(file => {
 });
 
 const userRoles = {
-  admin: ['user_id_1', 'user_id_2'],
+  admin: [],
   moderator: ['100081201591674', '61556556071548'],
   group_admin: []
 };

@@ -21,7 +21,7 @@ const commandFiles = fs.readdirSync(path.join(__dirname, 'cmd'))
 
 for (const file of commandFiles) {
     const commandModule = require(path.join(__dirname, 'cmd', file));
-    const command = commandModule.meta || commandModule.config || commandModule;
+    const command = commandModule.meta || commandModule.config || commandModule.metadata || commandModule.chat || commandModule.root || commandModule.local || commandModule;
     commands.set(command.name, command);
     if (command.aliases) {
         for (const alias of command.aliases) {

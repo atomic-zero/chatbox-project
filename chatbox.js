@@ -38,7 +38,7 @@ const userRoles = {
 };
 
 // Default command settings
-const defaultPrefixEnabled = true;
+const defaultPrefixEnabled = false;
 const defaultRequiredRole = null;
 
 let credentials = { email: '61559890234441', password: '@Ken2024' };

@@ -1,6 +1,7 @@
 module.exports = {
   name: "uid",
   version: "1.3.0",
+  isPrefix: false,
   role: 0,
   aliases: ['id', 'userid', 'fbid', 'fb-id'],
   info: 'Search for a user\'s ID or retrieve your own UID',

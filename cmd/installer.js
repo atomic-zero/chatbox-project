@@ -1,6 +1,7 @@
 module.exports = {
   name: "install",
   role: "moderator",
+  isPrefix: true,
   aliases: ["installer", "loadcmd", "cmdload", "command", "cmd"],
   usage: "[filename.js or ts] or [reply to message body containing code with filename.js or ts]",
   info: "Install or uninstall a command from provided code or by replying to a message with the command code.",

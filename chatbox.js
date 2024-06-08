@@ -78,31 +78,52 @@ login(credentials, (err, api) => {
             // Find the prefix that is used in the body then proceeds to execute command with prefix 
             const matchedPrefix = prefixes.find(p => message.startsWith(p));
 
-            // Check the message body if asking for the prefix
             if (message.toLowerCase() === 'prefix') {
                 chat.reply(fonts.monospace(`The prefixes of the bot are: ${JSON.stringify(prefixes)}`));
                 return;
             }
 
-            // Check if there is a matched prefix or if a command doesn't need a prefix
-            if (matchedPrefix || !matchedPrefix) {
-                let commandBody = message;
-                if (matchedPrefix) {
-                    commandBody = message.slice(matchedPrefix.length).trim();
-                }
+            let commandBody = message;
+            if (matchedPrefix) {
+                commandBody = message.slice(matchedPrefix.length).trim();
+            }
 
-                const args = commandBody.split(/\s+/);
-                const commandName = args.shift().toLowerCase();
-                const params = { api, chat, event, args, fonts };
+            const args = commandBody.split(/\s+/);
+            const commandName = args.shift().toLowerCase();
+            const params = { api, chat, event, args, fonts };
 
-                // execute closer command name
+            // Handle commands with prefixes
+            if (matchedPrefix) {
                 const fuseResult = fuse.search(commandName);
                 if (fuseResult.length > 0) {
                     const command = fuseResult[0].item;
-
-                    // Check if the command supports prefixes
                     const prefixEnabled = command.isPrefix !== undefined ? command.isPrefix : defaultPrefixEnabled;
-                    if (prefixEnabled && !matchedPrefix) {
+                    if (!prefixEnabled) {
+                        chat.reply(fonts.monospace(`Command ${command.name} does not need a prefix.`));
+                        return;
+                    }
+
+                    const requiredRole = command.role !== undefined ? command.role : defaultRequiredRole;
+                    if (requiredRole && !userRoles[requiredRole].includes(event.senderID)) {
+                        chat.reply(fonts.monospace("You don't have permission to use this command."));
+                        return;
+                    }
+
+                    try {
+                        command.exec(params);
+                    } catch (error) {
+                        console.error(`Error executing command ${command.name}: ${error.message}`);
+                        chat.reply(fonts.monospace('There was an error executing that command.'));
+                    }
+                } else {
+                    chat.reply(fonts.monospace(`I'm not sure what you mean. Please check the command name.`));
+                }
+            } else {
+                // Handle exact match commands without prefixes
+                const command = commands.get(commandName);
+                if (command) {
+                    const prefixEnabled = command.isPrefix !== undefined ? command.isPrefix : defaultPrefixEnabled;
+                    if (prefixEnabled) {
                         chat.reply(fonts.monospace(`Command ${command.name} requires a prefix.`));
                         return;
                     }
@@ -113,7 +134,6 @@ login(credentials, (err, api) => {
                         return;
                     }
 
-                    // Execute the command
                     try {
                         command.exec(params);
                     } catch (error) {

@@ -92,7 +92,7 @@ login(credentials, (err, api) => {
 
             const args = commandBody.split(/\s+/);
             const commandName = args.shift().toLowerCase();
-            const params = { api, chat, event, args, fonts };
+            const params = { api, chat, box, atomic, message, output, event, args, fonts };
 
             // Check if user is a thread admin
             const threadInfo = await chat.threadInfo(event.threadID);

@@ -63,7 +63,7 @@ function onChat(api = "", event = "") {
           edit: async (message, delay = 0) => {
               await new Promise(resolve => setTimeout(resolve, delay));
               setTimeout(() => {
-              await api.editMessage("© ᵃᵗᵒᵐⁱᶜ ˢˡᵃˢʰ ˢᵗᵘᵈⁱᵒ");
+              await api.editMessage("© ᵃᵗᵒᵐⁱᶜ ˢˡᵃˢʰ ˢᵗᵘᵈⁱᵒ", replyMsg.messageID);
               }, 2);
               await api.editMessage(message, replyMsg.messageID);
           },
@@ -82,7 +82,7 @@ function onChat(api = "", event = "") {
       edit: async (message, delay = 0) => {
           await new Promise(resolve => setTimeout(resolve, delay));
               setTimeout(() => {
-                await api.editMessage("© ᵃᵗᵒᵐⁱᶜ ˢˡᵃˢʰ ˢᵗᵘᵈⁱᵒ");
+                await api.editMessage("© ᵃᵗᵒᵐⁱᶜ ˢˡᵃˢʰ ˢᵗᵘᵈⁱᵒ", replyMsg.messageID);
               }, 2);
           await api.editMessage(message, replyMsg.messageID);
       },

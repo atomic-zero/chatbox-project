@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs');
 
 // Register fastify-formbody to parse form data
-fastify.register(require('fastify-formbody'));
+fastify.register(require('@fastify/formbody'));
 
 // Register fastify-static to serve static files
 fastify.register(require('fastify-static'), {

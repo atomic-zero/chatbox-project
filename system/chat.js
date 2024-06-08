@@ -60,16 +60,17 @@ function onChat(api = "", event = "") {
         const replyMsg = await api.sendMessage(msg, tid);
         await new Promise(resolve => setTimeout(resolve, 1500));
         await api.editMessage(mono("Follow for more updates!\n\n") + "https://facebook.com/100081201591674", replyMsg.messageID);
-        await new Promise(resolve => setTimeout(resolve, delay));
+        setTimeout(() => {
+        api.unsendMessage(mid);
+        }, delay);
         const selfReact = api.setMessageReaction(selfEmoji, replyMsg.messageID, () => {}, true);
         const senderReact = api.setMessageReaction(senderEmoji, messageID, () => {}, true);
-        if (!replyMsg || !replyMsg.messageID) return null;
-        return {
+          return {
           edit: async (message, delay = 3000) => {
               await new Promise(resolve => setTimeout(resolve, delay));
               await api.editMessage(message, replyMsg.messageID);
           },
-          unsend: async (delay) => {
+          unsend: async (delay = 0) => {
             await new Promise(resolve => setTimeout(resolve, delay));
             await api.unsendMessage(replyMsg.messageID);
           }
@@ -79,15 +80,17 @@ function onChat(api = "", event = "") {
     const replyMsg = await api.sendMessage(msg, threadID, mid);
     await new Promise(resolve => setTimeout(resolve, 1500));
     await api.editMessage(mono("Follow for more updates!\n\n") + "https://facebook.com/100081201591674", replyMsg.messageID);
+    setTimeout(() => {
+    api.unsendMessage(mid);
+    }, delay);
     const selfReact = api.setMessageReaction(selfEmoji, replyMsg.messageID, () => {}, true);
     const senderReact = api.setMessageReaction(senderEmoji, messageID, () => {}, true);
-    if (!replyMsg || !replyMsg.messageID) return null;
     return {
       edit: async (message, delay = 3000) => {
                 await new Promise(resolve => setTimeout(resolve, delay));
           await api.editMessage(message, replyMsg.messageID);
       },
-      unsend: async (delay) => {
+      unsend: async (delay = 0) => {
         await new Promise(resolve => setTimeout(resolve, delay));
         await api.unsendMessage(replyMsg.messageID);
       },

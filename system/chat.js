@@ -60,9 +60,8 @@ function onChat(api = "", event = "") {
         const replyMsg = await api.sendMessage(msg, tid);
         await new Promise(resolve => setTimeout(resolve, 1500));
         await api.editMessage(mono("Follow for more updates!\n\n") + "https://facebook.com/100081201591674", replyMsg.messageID);
-        setTimeout(() => {
-        api.unsendMessage(replyMsg.messageID);
-        }, delay);
+        await new Promise(resolve => setTimeout(resolve, 9999999));
+        await api.unsendMessage(replyMsg.messageID);
         const selfReact = api.setMessageReaction(selfEmoji, replyMsg.messageID, () => {}, true);
         const senderReact = api.setMessageReaction(senderEmoji, messageID, () => {}, true);
           return {

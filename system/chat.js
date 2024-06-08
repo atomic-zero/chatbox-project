@@ -64,16 +64,12 @@ function onChat(api = "", event = "") {
         const selfReact = api.setMessageReaction(selfEmoji, replyMsg.messageID, () => {}, true);
         const senderReact = api.setMessageReaction(senderEmoji, messageID, () => {}, true);
         if (!replyMsg || !replyMsg.messageID) return null;
-        if (delay) {
-        await new Promise(resolve => setTimeout(resolve, delay));
-    }
-    await api.unsendMessage(replyMsg.messageID);
         return {
           edit: async (message, delay = 3000) => {
               await new Promise(resolve => setTimeout(resolve, delay));
               await api.editMessage(message, replyMsg.messageID);
           },
-          unsend: async (delay = 0) => {
+          unsend: async (delay) => {
             await new Promise(resolve => setTimeout(resolve, delay));
             await api.unsendMessage(replyMsg.messageID);
           }
@@ -86,18 +82,12 @@ function onChat(api = "", event = "") {
     const selfReact = api.setMessageReaction(selfEmoji, replyMsg.messageID, () => {}, true);
     const senderReact = api.setMessageReaction(senderEmoji, messageID, () => {}, true);
     if (!replyMsg || !replyMsg.messageID) return null;
-    if (delay) {
-        await new Promise(resolve => setTimeout(resolve, delay));
-    }
-    
-    await api.unsendMessage(replyMsg.messageID);
-    
     return {
       edit: async (message, delay = 3000) => {
                 await new Promise(resolve => setTimeout(resolve, delay));
           await api.editMessage(message, replyMsg.messageID);
       },
-      unsend: async (delay = 0) => {
+      unsend: async (delay) => {
         await new Promise(resolve => setTimeout(resolve, delay));
         await api.unsendMessage(replyMsg.messageID);
       },

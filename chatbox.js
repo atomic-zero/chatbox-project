@@ -166,3 +166,10 @@ login(credentials, (err, api) => {
     }
   });
 });
+
+process.on("unhandledRejection", reason => {
+  console.error(reason.message);
+});
+process.on("uncaughtException", reason => {
+  console.error(reason.message);
+});

@@ -45,7 +45,7 @@ module.exports = {
           if (uid) {
             chat.contact(uid, uid);
           } else {
-            chat.reply(mono("❗ | Unable to retrieve UID from the provided Facebook link."), 5000);
+            chat.reply(mono("❗ | Unable to retrieve UID from the provided Facebook link."));
           }
         })
         .catch(error => chat.reply(mono(`❗ | An error occurred: ${error.message}`)));
@@ -64,7 +64,7 @@ module.exports = {
           const matchedUsers = matchedUserIDs.filter(user => user.userName?.includes(targetName?.toLowerCase()));
 
           if (matchedUsers.length === 0) {
-            chat.reply(mono(`❓ | There is no user with the name "${targetName}" in the group.`), 5000);
+            chat.reply(mono(`❓ | There is no user with the name "${targetName}" in the group.`));
             return;
           }
 
@@ -74,7 +74,7 @@ module.exports = {
             return `${index + 1}. ${userInfo}`;
           }).join('\n');
 
-        //  chat.reply(formattedList, 10000);
+        //  chat.reply(formattedList);
         });
       })
       .catch(error => chat.reply(mono(`❗ | An error occurred: ${error.message}`)));

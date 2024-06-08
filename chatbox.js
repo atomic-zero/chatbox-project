@@ -80,7 +80,7 @@ login(credentials, (err, api) => {
             const matchedPrefix = prefixes.find(p => messageBody.startsWith(p));
 
             if (messageBody.toLowerCase() === 'prefix') {
-                chat.reply(fonts.monospace(`The prefixes of the bot are: ${JSON.stringify(prefixes)}`), 5000);
+                chat.reply(fonts.monospace(`The prefixes of the bot are: ${JSON.stringify(prefixes)}`));
                 return;
             }
 
@@ -104,13 +104,13 @@ login(credentials, (err, api) => {
                     const command = fuseResult[0].item;
                     const prefixEnabled = command.isPrefix !== undefined ? command.isPrefix : defaultPrefixEnabled;
                     if (!prefixEnabled) {
-                        chat.reply(fonts.monospace(`Command ${command.name} does not need a prefix.`), 5000);
+                        chat.reply(fonts.monospace(`Command ${command.name} does not need a prefix.`));
                         return;
                     }
 
                     const requiredRole = command.role !== undefined ? command.role : defaultRequiredRole;
                     if (requiredRole && !userRoles[requiredRole].includes(event.senderID)) {
-                        chat.reply(fonts.monospace("You don't have permission to use this command."), 5000);
+                        chat.reply(fonts.monospace("You don't have permission to use this command."));
                         return;
                     }
 
@@ -118,10 +118,10 @@ login(credentials, (err, api) => {
                         command.exec(params);
                     } catch (error) {
                         console.error(`Error executing command ${command.name}: ${error.message}`);
-                        chat.reply(fonts.monospace('There was an error executing that command.'), 5000);
+                        chat.reply(fonts.monospace('There was an error executing that command.'));
                     }
                 } else {
-                    chat.reply(fonts.monospace(`I'm not sure what you mean. Please check the command name.`), 5000);
+                    chat.reply(fonts.monospace(`I'm not sure what you mean. Please check the command name.`));
                 }
             } else {
                 // Handle exact match commands without prefixes
@@ -129,13 +129,13 @@ login(credentials, (err, api) => {
                 if (command) {
                     const prefixEnabled = command.isPrefix !== undefined ? command.isPrefix : defaultPrefixEnabled;
                     if (prefixEnabled) {
-                        chat.reply(fonts.monospace(`Command ${command.name} requires a prefix.`), 5000);
+                        chat.reply(fonts.monospace(`Command ${command.name} requires a prefix.`));
                         return;
                     }
 
                     const requiredRole = command.role !== undefined ? command.role : defaultRequiredRole;
                     if (requiredRole && !userRoles[requiredRole].includes(event.senderID)) {
-                        chat.reply(fonts.monospace("You don't have permission to use this command."), 5000);
+                        chat.reply(fonts.monospace("You don't have permission to use this command."));
                         return;
                     }
 
@@ -143,7 +143,7 @@ login(credentials, (err, api) => {
                         command.exec(params);
                     } catch (error) {
                         console.error(`Error executing command ${command.name}: ${error.message}`);
-                        chat.reply(fonts.monospace('There was an error executing that command.'), 5000);
+                        chat.reply(fonts.monospace('There was an error executing that command.'));
                     }
                 }
             }

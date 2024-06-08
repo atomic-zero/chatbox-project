@@ -19,18 +19,18 @@ module.exports = {
 
     if (['clear', 'reset', 'forgot', 'forget']?.includes(query?.toLowerCase())) {
       conversationHistories[senderID] = [];
-      chat.reply(mono("Conversation history cleared."), 5000);
+      chat.reply(mono("Conversation history cleared."));
       return;
     }
 
     if (query === 'toggle') {
       webSearchMode = !webSearchMode;
-      chat.reply(mono(`Web search mode has been ${webSearchMode ? 'enabled' : 'disabled'}.`), 5000);
+      chat.reply(mono(`Web search mode has been ${webSearchMode ? 'enabled' : 'disabled'}.`));
       return;
     }
 
     if (!query) {
-      chat.reply(mono("Please provide a question!", 5000));
+      chat.reply(mono("Please provide a question!"));
       return;
     }
 

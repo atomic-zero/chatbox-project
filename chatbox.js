@@ -34,6 +34,7 @@ for (const file of commandFiles) {
 const userRoles = {
     'admin': ['user_id_1', 'user_id_2'],
     'moderator': ['user_id_3', 'user_id_4'],
+    'group_admin': []
 };
 
 // Default command settings
@@ -63,7 +64,7 @@ login(credentials, (err, api) => {
     });
 
     // Listen for messages
-    api.listenMqtt((err, event) => {
+    api.listenMqtt(async (err, event) => {
         if (err) {
             return console.error(err);
         }
@@ -92,6 +93,10 @@ login(credentials, (err, api) => {
             const args = commandBody.split(/\s+/);
             const commandName = args.shift().toLowerCase();
             const params = { api, chat, event, args, fonts };
+
+            // Check if user is a thread admin
+            const threadInfo = await chat.threadInfo(event.threadID);
+            userRoles.group_admin = threadInfo.adminIDs.map(admin => admin.id);
 
             // Handle commands with prefixes
             if (matchedPrefix) {

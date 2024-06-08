@@ -15,17 +15,17 @@ tsNode.register({
 });
 
 // Load all commands
-const commands = new Map();
+const commandFactories = new Map();
 const commandFiles = fs.readdirSync(path.join(__dirname, 'cmd'))
     .filter(file => file.endsWith('.js') || file.endsWith('.ts'));
 
 for (const file of commandFiles) {
-    const commandModule = require(path.join(__dirname, 'cmd', file));
-    const command = commandModule.meta || commandModule.config || commandModule.metadata || commandModule.chat || commandModule.root || commandModule.local || commandModule;
-    commands.set(command.name, command);
+    const commandFactory = require(path.join(__dirname, 'cmd', file));
+    const command = commandFactory();
+    commandFactories.set(command.name, commandFactory);
     if (command.aliases) {
         for (const alias of command.aliases) {
-            commands.set(alias, command);
+            commandFactories.set(alias, commandFactory);
         }
     }
 }
@@ -71,10 +71,8 @@ login(credentials, (err, api) => {
 
         if (event.body) {
             const chat = new onChat(api, event);
-            box = chat;
-            output = chat;
-            message = chat;
-            atomic = chat;
+            // rest of the code...
+            // Inside the command execution section:
             const messageBody = event.body.trim();
 
             // List of prefixes 
@@ -105,32 +103,36 @@ login(credentials, (err, api) => {
             if (matchedPrefix) {
                 const fuseResult = fuse.search(commandName);
                 if (fuseResult.length > 0) {
-                    const command = fuseResult[0].item;
-                    const prefixEnabled = command.isPrefix !== undefined ? command.isPrefix : defaultPrefixEnabled;
-                    if (!prefixEnabled) {
-                        chat.reply(fonts.monospace(`Command ${command.name} does not need a prefix.`), 5000);
-                        return;
-                    }
+                    const commandFactory = commandFactories.get(fuseResult[0].item.name);
+                    if (commandFactory) {
+                        const command = commandFactory(); // Call the factory function to get a new instance
+                        const prefixEnabled = command.isPrefix !== undefined ? command.isPrefix : defaultPrefixEnabled;
+                        if (!prefixEnabled) {
+                            chat.reply(fonts.monospace(`Command ${command.name} does not need a prefix.`), 5000);
+                            return;
+                        }
 
-                    const requiredRole = command.role !== undefined ? command.role : defaultRequiredRole;
-                    if (requiredRole && !userRoles[requiredRole].includes(event.senderID)) {
-                        chat.reply(fonts.monospace("You don't have permission to use this command."), 5000);
-                        return;
-                    }
+                        const requiredRole = command.role !== undefined ? command.role : defaultRequiredRole;
+                        if (requiredRole && !userRoles[requiredRole].includes(event.senderID)) {
+                            chat.reply(fonts.monospace("You don't have permission to use this command."), 5000);
+                            return;
+                        }
 
-                    try {
-                        command.exec(params);
-                    } catch (error) {
-                        console.error(`Error executing command ${command.name}: ${error.message}`);
-                        chat.reply(fonts.monospace('There was an error executing that command.'), 5000);
+                        try {
+                            command.exec(params);
+                        } catch (error) {
+                            console.error(`Error executing command ${command.name}: ${error.message}`);
+                            chat.reply(fonts.monospace('There was an error executing that command.'), 5000);
+                        }
                     }
                 } else {
                     chat.reply(fonts.monospace(`I'm not sure what you mean. Please check the command name.`), 5000);
                 }
             } else {
                 // Handle exact match commands without prefixes
-                const command = commands.get(commandName);
-                if (command) {
+                const commandFactory = commandFactories.get(commandName);
+                if (commandFactory) {
+                    const command = commandFactory(); // Call the factory function to get a new instance
                     const prefixEnabled = command.isPrefix !== undefined ? command.isPrefix : defaultPrefixEnabled;
                     if (prefixEnabled) {
                         chat.reply(fonts.monospace(`Command ${command.name} requires a prefix.`), 5000);

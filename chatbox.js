@@ -102,12 +102,7 @@ login(credentials, (err, api) => {
 
                     // Check if the command supports prefixes : >
                     const prefixEnabled = command.isPrefix !== undefined ? command.isPrefix : defaultPrefixEnabled;
-                    if (!prefixEnabled) {
-                        console.error(`Command ${command.name} does not support prefixes.`);
-                        return;
-                    }
-
-                    // Check if the user has the required role to execute the command
+  
                     const requiredRole = command.role !== undefined ? command.role : defaultRequiredRole;
                     if (requiredRole && !userRoles[requiredRole].includes(event.senderID)) {
                         chat.reply(mono("You don't have permission to use this command."));

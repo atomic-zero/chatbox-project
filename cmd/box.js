@@ -1,3 +1,6 @@
+const conversationHistories = {};
+let webSearchMode = false;
+
 module.exports = {
   name: "box",
   aliases: ["bb", "blackbox", "blackbox-ai"],
@@ -12,8 +15,6 @@ module.exports = {
   exec: async ({ chat, args, event, fonts }) => {
     const mono = txt => fonts.monospace(txt);
     const axios = require("axios");
-    const conversationHistories = {};
-    let webSearchMode = false;
     const { threadID, senderID } = event;
     const query = args.join(" ");
 

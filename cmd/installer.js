@@ -1,10 +1,10 @@
 module.exports = {
   name: "install",
+  role: "moderator",
   aliases: ["installer", "loadcmd", "cmdload", "command", "cmd"],
   usage: "[filename.js or ts] or [reply to message body containing code with filename.js or ts]",
   info: "Install or uninstall a command from provided code or by replying to a message with the command code.",
   guide: "cmd [filename.js or ts] or reply to message body with [filename.js or ts] to install the command. Use 'cmd uninstall [filename.js or ts]' keyword to remove a command. Use 'cmd list' to list all installed commands.",
-  type: "installation",
   credits: "Kenneth Panio",
   version: "1.1.0",
   async exec({ chat, event, args }) {

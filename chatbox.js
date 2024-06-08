@@ -63,6 +63,9 @@ login(credentials, (err, api) => {
         keys: ['name', 'aliases']
     });
 
+    // Define a map to store command execution contexts for each sender
+    const senderContexts = new Map();
+
     // Listen for messages
     api.listenMqtt(async (err, event) => {
         if (err) {
@@ -72,6 +75,13 @@ login(credentials, (err, api) => {
         if (event.body) {
             const chat = new onChat(api, event);
             const senderID = event.senderID;
+
+            // Get or create a command execution context for the sender
+            let context = senderContexts.get(senderID);
+            if (!context) {
+                context = {};
+                senderContexts.set(senderID, context);
+            }
 
             const messageBody = event.body.trim();
 
@@ -93,7 +103,7 @@ login(credentials, (err, api) => {
 
             const args = commandBody.split(/\s+/);
             const commandName = args.shift().toLowerCase();
-            const params = { api, chat, event, args, fonts };
+            const params = { api, chat, event, args, fonts, context };
 
             // Check if user is a thread admin
             const threadInfo = await chat.threadInfo(event.threadID);

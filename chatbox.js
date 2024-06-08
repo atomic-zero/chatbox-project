@@ -71,8 +71,6 @@ login(credentials, (err, api) => {
 
         if (event.body) {
             const chat = new onChat(api, event);
-            // rest of the code...
-            // Inside the command execution section:
             const messageBody = event.body.trim();
 
             // List of prefixes 

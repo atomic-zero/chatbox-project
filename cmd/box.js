@@ -1,4 +1,6 @@
-const conversationHistories = {};
+const axios = require("axios");
+
+let conversationHistories = {};
 let webSearchMode = false;
 
 module.exports = {
@@ -8,17 +10,16 @@ module.exports = {
   isPrefix: false,
   credits: "Kenneth Panio",
   type: "artificial-intelligence",
-  info: "Interact with Blackbox AI. Use 'box switch' to toggle web search mode.",
+  info: "Interact with Blackbox AI. Use 'box toggle' to toggle web search mode.",
   usage: "[prompt]",
   guide: "blackbox How does nuclear fusion work?",
   cd: 6,
   exec: async ({ chat, args, event, fonts }) => {
     const mono = txt => fonts.monospace(txt);
-    const axios = require("axios");
     const { threadID, senderID } = event;
     const query = args.join(" ");
 
-    if (['clear', 'reset', 'forgot', 'forget']?.includes(query?.toLowerCase())) {
+    if (['clear', 'reset', 'forgot', 'forget'].includes(query.toLowerCase())) {
       conversationHistories[senderID] = [];
       chat.reply(mono("Conversation history cleared."));
       return;
@@ -35,7 +36,7 @@ module.exports = {
       return;
     }
 
-     answering = await chat.reply(mono("🕐 | Answering..."));
+    const answering = await chat.reply(mono("🕐 | Answering..."));
 
     conversationHistories[senderID] = conversationHistories[senderID] || [];
     conversationHistories[senderID].push({ content: query, role: senderID });

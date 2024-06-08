@@ -114,9 +114,10 @@ login(credentials, (err, api) => {
                         return;
                     }
 
-                    // Prepare arguments for the command execution
+                    // arguments for the command execution
                     const args = commandBody.split(/\s+/).slice(1);
-                    const params = { api, chat, event, args, output, box, fonts };
+                    let input = args;// alias of arguments
+                    const params = { api, chat, event, args, input, output, box, fonts };
 
                     // Execute the command
                     try {

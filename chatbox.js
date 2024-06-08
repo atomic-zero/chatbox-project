@@ -15,17 +15,17 @@ tsNode.register({
 });
 
 // Load all commands
-const commandFactories = new Map();
+const commands = new Map();
 const commandFiles = fs.readdirSync(path.join(__dirname, 'cmd'))
     .filter(file => file.endsWith('.js') || file.endsWith('.ts'));
 
 for (const file of commandFiles) {
-    const commandFactory = require(path.join(__dirname, 'cmd', file));
-    const command = commandFactory();
-    commandFactories.set(command.name, command);
+    const commandModule = require(path.join(__dirname, 'cmd', file));
+    const command = commandModule.meta || commandModule.config || commandModule.metadata || commandModule.chat || commandModule.root || commandModule.local || commandModule;
+    commands.set(command.name, command);
     if (command.aliases) {
         for (const alias of command.aliases) {
-            commandFactories.set(alias, command);
+            commands.set(alias, command);
         }
     }
 }
@@ -58,13 +58,10 @@ login(credentials, (err, api) => {
     console.log('Bot logged in and AppState saved');
 
     // Convert commands map to array for Fuse
-    const commandArray = Array.from(commandFactories.values());
+    const commandArray = Array.from(commands.values());
     const fuse = new Fuse(commandArray, {
         keys: ['name', 'aliases']
     });
-
-    // Define a map to store command execution contexts for each sender
-    const senderContexts = new Map();
 
     // Listen for messages
     api.listenMqtt(async (err, event) => {
@@ -76,13 +73,6 @@ login(credentials, (err, api) => {
             const chat = new onChat(api, event);
             const senderID = event.senderID;
 
-            // Get or create a command execution context for the sender
-            let context = senderContexts.get(senderID);
-            if (!context) {
-                context = {};
-                senderContexts.set(senderID, context);
-            }
-
             const messageBody = event.body.trim();
 
             // List of prefixes 
@@ -92,7 +82,7 @@ login(credentials, (err, api) => {
             const matchedPrefix = prefixes.find(p => messageBody.startsWith(p));
 
             if (messageBody.toLowerCase() === 'prefix') {
-                chat.reply(fonts.monospace(`The prefixes of the bot are: ${JSON.stringify(prefixes)}`));
+                chat.reply(fonts.monospace(`The prefixes of the bot are: ${JSON.stringify(prefixes)}`), 5000);
                 return;
             }
 
@@ -103,7 +93,7 @@ login(credentials, (err, api) => {
 
             const args = commandBody.split(/\s+/);
             const commandName = args.shift().toLowerCase();
-            const params = { api, chat, event, args, fonts, context };
+            const params = { api, chat, event, args, fonts };
 
             // Check if user is a thread admin
             const threadInfo = await chat.threadInfo(event.threadID);
@@ -113,49 +103,49 @@ login(credentials, (err, api) => {
             if (matchedPrefix) {
                 const fuseResult = fuse.search(commandName);
                 if (fuseResult.length > 0) {
-                    const commandInstance = fuseResult[0].item;
-                    const prefixEnabled = commandInstance.isPrefix !== undefined ? commandInstance.isPrefix : defaultPrefixEnabled;
+                    const command = fuseResult[0].item;
+                    const prefixEnabled = command.isPrefix !== undefined ? command.isPrefix : defaultPrefixEnabled;
                     if (!prefixEnabled) {
-                        chat.reply(fonts.monospace(`Command ${commandInstance.name} does not need a prefix.`));
+                        chat.reply(fonts.monospace(`Command ${command.name} does not need a prefix.`), 5000);
                         return;
                     }
 
-                    const requiredRole = commandInstance.role !== undefined ? commandInstance.role : defaultRequiredRole;
+                    const requiredRole = command.role !== undefined ? command.role : defaultRequiredRole;
                     if (requiredRole && !userRoles[requiredRole].includes(senderID)) {
-                        chat.reply(fonts.monospace("You don't have permission to use this command."));
+                        chat.reply(fonts.monospace("You don't have permission to use this command."), 5000);
                         return;
                     }
 
                     try {
-                        commandInstance.exec(params);
+                        command.exec(params);
                     } catch (error) {
-                        console.error(`Error executing command ${commandInstance.name}: ${error.message}`);
-                        chat.reply(fonts.monospace('There was an error executing that command.'));
+                        console.error(`Error executing command ${command.name}: ${error.message}`);
+                        chat.reply(fonts.monospace('There was an error executing that command.'), 5000);
                     }
                 } else {
-                    chat.reply(fonts.monospace(`I'm not sure what you mean. Please check the command name.`));
+                    chat.reply(fonts.monospace(`I'm not sure what you mean. Please check the command name.`), 5000);
                 }
             } else {
                 // Handle exact match commands without prefixes
-                const commandInstance = commandFactories.get(commandName);
-                if (commandInstance) {
-                    const prefixEnabled = commandInstance.isPrefix !== undefined ? commandInstance.isPrefix : defaultPrefixEnabled;
+                const command = commands.get(commandName);
+                if (command) {
+                    const prefixEnabled = command.isPrefix !== undefined ? command.isPrefix : defaultPrefixEnabled;
                     if (prefixEnabled) {
-                        chat.reply(fonts.monospace(`Command ${commandInstance.name} requires a prefix.`));
+                        chat.reply(fonts.monospace(`Command ${command.name} requires a prefix.`), 5000);
                         return;
                     }
 
-                    const requiredRole = commandInstance.role !== undefined ? commandInstance.role : defaultRequiredRole;
+                    const requiredRole = command.role !== undefined ? command.role : defaultRequiredRole;
                     if (requiredRole && !userRoles[requiredRole].includes(senderID)) {
-                        chat.reply(fonts.monospace("You don't have permission to use this command."));
+                        chat.reply(fonts.monospace("You don't have permission to use this command."), 5000);
                         return;
                     }
 
                     try {
-                        commandInstance.exec(params);
+                        command.exec(params);
                     } catch (error) {
-                        console.error(`Error executing command ${commandInstance.name}: ${error.message}`);
-                        chat.reply(fonts.monospace('There was an error executing that command.'));
+                        console.error(`Error executing command ${command.name}: ${error.message}`);
+                        chat.reply(fonts.monospace('There was an error executing that command.'), 5000);
                     }
                 }
             }

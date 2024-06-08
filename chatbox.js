@@ -47,6 +47,13 @@ if (fs.existsSync('appstate.json')) {
   credentials = { appState: JSON.parse(fs.readFileSync('appstate.json', 'utf8')) };
 }
 
+// Load or initialize data
+let storedData = {};
+const dataFilePath = 'stored_data.json';
+if (fs.existsSync(dataFilePath)) {
+  storedData = JSON.parse(fs.readFileSync(dataFilePath, 'utf8'));
+}
+
 // Login to Facebook
 login(credentials, (err, api) => {
   if (err) {
@@ -95,7 +102,7 @@ login(credentials, (err, api) => {
 
       const args = commandBody.split(/\s+/);
       const commandName = args.shift().toLowerCase();
-      const params = { api, chat, event, args, fonts };
+      const params = { api, chat, event, args, fonts, storedData }; // Pass stored data to commands
 
       // Check if user is a thread admin
       const threadInfo = await chat.threadInfo(event.threadID);
@@ -157,4 +164,7 @@ login(credentials, (err, api) => {
   });
 });
 
-
+// Save data to file when the script exits
+process.on('exit', () => {
+  fs.writeFileSync(dataFilePath, JSON.stringify(storedData, null, 2));
+});

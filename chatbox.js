@@ -77,7 +77,7 @@ login(credentials, (err, api) => {
       atomic = chat;
       const mono = txt => fonts.monospace(txt);
       const reply = async (msg) => {
-      const msgInfo = await reply(mono(msg));
+      const msgInfo = await chat.reply(mono(msg));
                msgInfo.unsend(5000);
                   }
       const messageBody = event.body.trim();

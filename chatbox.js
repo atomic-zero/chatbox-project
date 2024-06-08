@@ -86,8 +86,8 @@ login(credentials, (err, api) => {
             const commandBody = event.body.slice(matchedPrefix.length).trim();
 
             // Check if the message is asking for the prefix
-            if (event?.body?.toLowerCase().startsWith('prefix')) {
-                chat.reply(`The prefix of the bot is: ${matchedPrefix}`);
+            if (event.body.toLowerCase().startsWith('prefix')) {
+                chat.reply(`The prefix of the bot is: ${JSON.stringify(prefixes)}`);
                 return;
             }
 

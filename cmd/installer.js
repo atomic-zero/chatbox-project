@@ -24,7 +24,7 @@ module.exports = {
     };
 
     if (args[0] === 'list') {
-      return chat.reply(mono(listCommands()), 120000);
+      return chat.reply(mono(listCommands()));
     }
 
     if (uninstallKeywords.includes(args[0])) {

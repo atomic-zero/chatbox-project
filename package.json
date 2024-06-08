@@ -14,6 +14,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "fastify": "^4.27.0",
     "ts-node": "^10.9.2",
     "cheerio": "^1.0.0-rc.12",
     "request": "^2.88.2",

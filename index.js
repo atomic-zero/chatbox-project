@@ -1,6 +1,6 @@
 const { spawn } = require("child_process");
 const path = require('path');
-const SCRIPT_FILE = "chatbox.js";
+const SCRIPT_FILE = "./src/app.js";
 const SCRIPT_PATH = path.join(__dirname, SCRIPT_FILE);
 
 function start() {

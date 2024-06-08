@@ -13,6 +13,16 @@ tsNode.register({
   }
 });
 
+const loadConfig = () => {
+  if (fs.existsSync('config.json')) {
+    return JSON.parse(fs.readFileSync('config.json', 'utf8'));
+  }
+  throw new Error('Configuration file not found!');
+};
+
+const config = loadConfig();
+const { credentials, prefixes, adminRoles } = config;
+
 const commands = new Map();
 const commandFiles = fs.readdirSync(path.join(__dirname, 'cmd'))
   .filter(file => file.endsWith('.js') || file.endsWith('.ts'));
@@ -28,8 +38,8 @@ commandFiles.forEach(file => {
 });
 
 const userRoles = {
-  admin: ['user_id_1', 'user_id_2'],
-  moderator: ['100081201591674', '61556556071548'],
+  admin: adminRoles,
+  moderator: [],
   group_admin: []
 };
 
@@ -41,11 +51,6 @@ const roleHierarchy = {
 
 const defaultPrefixEnabled = false;
 const defaultRequiredRole = null;
-
-let credentials = { email: '61559890234441', password: '@Ken2024' };
-if (fs.existsSync('appstate.json')) {
-  credentials = { appState: JSON.parse(fs.readFileSync('appstate.json', 'utf8')) };
-}
 
 login(credentials, (err, api) => {
   if (err) {
@@ -75,8 +80,6 @@ login(credentials, (err, api) => {
         msgInfo.unsend(5000);
       };
       const messageBody = event.body.trim();
-
-      const prefixes = ['!', '?', '/'];
       const matchedPrefix = prefixes.find(p => messageBody.startsWith(p));
 
       if (messageBody.toLowerCase() === 'prefix') {

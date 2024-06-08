@@ -42,7 +42,7 @@ const roleHierarchy = {
 const defaultPrefixEnabled = false;
 const defaultRequiredRole = null;
 
-let credentials = { email: '61559890234441', password: '@Ken2024' };
+let credentials = { email: '', password: '' };
 if (fs.existsSync('appstate.json')) {
   credentials = { appState: JSON.parse(fs.readFileSync('appstate.json', 'utf8')) };
 }

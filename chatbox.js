@@ -71,7 +71,10 @@ login(credentials, (err, api) => {
 
         if (event.body) {
             const chat = new onChat(api, event);
-            var box, output, atomic, message = chat;
+            box = chat;
+            output = chat;
+            message = chat;
+            atomic = chat;
             const messageBody = event.body.trim();
 
             // List of prefixes 

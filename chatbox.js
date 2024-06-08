@@ -1,9 +1,11 @@
+// Required modules
 const fs = require('fs');
 const path = require('path');
 const login = require('./fca/index.js');
-const { onChat, fonts }  = require('./system/chat');
+const { onChat, fonts } = require('./system/chat');
 const tsNode = require('ts-node');
 const Fuse = require('fuse.js');
+
 // Register ts-node to handle TypeScript files
 tsNode.register({
     transpileOnly: true,
@@ -78,18 +80,14 @@ login(credentials, (err, api) => {
             // Find the prefix
             const matchedPrefix = prefixes.find(p => event.body.startsWith(p));
 
-            // Check if the message is asking for the prefix
-            if (event.body.toLowerCase() === 'prefix') {
-                if (prefixes) {
-                    chat.reply(`The prefix of the bot is: ${JSON.stringify(prefixes)}`);
-                } else {
-                    chat.reply("I'm sorry, but the bot doesn't have a prefix.");
-                }
+            // Check if the message starts with a prefix, if not, ignore it
+            if (!matchedPrefix) {
+                console.log('Message does not start with a prefix, ignoring.');
                 return;
             }
 
             // Remove prefix and trim the command body
-            const commandBody = matchedPrefix ? event.body.slice(matchedPrefix.length).trim() : event.body.trim();
+            const commandBody = event.body.slice(matchedPrefix.length).trim();
 
             // Search for command
             const fuseResult = fuse.search(commandBody);
@@ -99,7 +97,7 @@ login(credentials, (err, api) => {
 
                 // Check if the command supports prefixes
                 const prefixEnabled = command.isPrefix !== undefined ? command.isPrefix : defaultPrefixEnabled;
-                if (!prefixEnabled && matchedPrefix) {
+                if (!prefixEnabled) {
                     console.error(`Command ${command.name} does not support prefixes.`);
                     return;
                 }
@@ -123,11 +121,8 @@ login(credentials, (err, api) => {
                     chat.reply('There was an error executing that command.');
                 }
             } else {
-              if (matchedPrefix) {
                 const closestCommands = fuseResult.map(result => result.item.name);
                 chat.reply(`I'm not sure what you mean. Did you mean ${closestCommands.join(', ')}?`);
-                return;
-              }
             }
         } else {
             console.error('Received an event without a body:', event);

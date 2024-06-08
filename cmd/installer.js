@@ -7,7 +7,6 @@ module.exports = {
   type: "installation",
   credits: "Kenneth Panio",
   version: "1.1.0",
-  role: 3,
 exec({ chat, event, args }) {
   const fs = require('fs');
   const path = require('path');

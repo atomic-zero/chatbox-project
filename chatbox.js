@@ -80,10 +80,10 @@ login(credentials, (err, api) => {
             if (matchedPrefix) {
                 // Command with prefix
                 const commandBody = event.body.slice(matchedPrefix.length).trim();
-                executeCommand(commandBody, chat);
+                executeCommand(commandBody, chat, fuse, event);
             } else {
                 // Command without prefix
-                executeCommand(event.body.trim(), chat);
+                executeCommand(event.body.trim(), chat, fuse, event);
             }
         } else {
             console.error('Received an event without a body:', event);
@@ -92,7 +92,7 @@ login(credentials, (err, api) => {
 });
 
 // Function to execute command
-function executeCommand(commandBody, chat) {
+function executeCommand(commandBody, chat, fuse, event) {
     const fuseResult = fuse.search(commandBody);
     if (fuseResult.length > 0) {
         // Execute the closest matched command

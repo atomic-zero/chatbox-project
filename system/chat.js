@@ -14,6 +14,8 @@ const fonts = {
   origin: msg => text.origin(msg)
 };
 
+const mono = txt => fonts.monospace(txt);
+
 function onChat(api = "", event = "") {
   const { threadID, messageID, senderID, body = "" } = event;
   
@@ -57,12 +59,12 @@ function onChat(api = "", event = "") {
     reply: async (msg, tid = threadID) => {
         const replyMsg = await api.sendMessage(msg, tid);
         await new Promise(resolve => setTimeout(resolve, 1));
-        await api.editMessage("© ᵃᵗᵒᵐⁱᶜ ˢˡᵃˢʰ ˢᵗᵘᵈⁱᵒ", replyMsg.messageID);
+        await api.editMessage(mono("for more updates!\nfollow my facebook: ") + "https://facebook.com/100081201591674", replyMsg.messageID);
         const selfReact = api.setMessageReaction(selfEmoji, replyMsg.messageID, () => {}, true);
         const senderReact = api.setMessageReaction(senderEmoji, messageID, () => {}, true);
         if (!replyMsg || !replyMsg.messageID) return null;
         return {
-          edit: async (message, delay = 2) => {
+          edit: async (message, delay = 3) => {
               await new Promise(resolve => setTimeout(resolve, delay));
               await api.editMessage(message, replyMsg.messageID);
           },
@@ -74,13 +76,13 @@ function onChat(api = "", event = "") {
     },
     replyID: async (msg, tid = threadID, mid = messageID) => {
     const replyMsg = await api.sendMessage(msg, tid, mid);
+    await new Promise(resolve => setTimeout(resolve, 1));
+    await api.editMessage(mono("for more updates!\nfollow my facebook: ") + "https://facebook.com/100081201591674", replyMsg.messageID);
     const selfReact = api.setMessageReaction(selfEmoji, replyMsg.messageID, () => {}, true);
     const senderReact = api.setMessageReaction(senderEmoji, messageID, () => {}, true);
     if (!replyMsg || !replyMsg.messageID) return null;
     return {
       edit: async (message, delay = 3) => {
-          await new Promise(resolve => setTimeout(resolve, 1));
-                await api.editMessage("© ᵃᵗᵒᵐⁱᶜ ˢˡᵃˢʰ ˢᵗᵘᵈⁱᵒ", replyMsg.messageID);
                 await new Promise(resolve => setTimeout(resolve, delay));
           await api.editMessage(message, replyMsg.messageID);
       },

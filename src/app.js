@@ -28,7 +28,7 @@ fastify.post('/configure', async (request, reply) => {
 // Start the server
 const start = async () => {
   try {
-    await fastify.listen(process.env.PORT || 3000);
+    await fastify.listen(process.env.PORT || 8216);
     fastify.log.info(`Server running on http://localhost:${process.env.PORT || 8216}`);
   } catch (err) {
     fastify.log.error(err);

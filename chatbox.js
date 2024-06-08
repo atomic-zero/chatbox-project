@@ -77,17 +77,17 @@ login(credentials, (err, api) => {
 
             // Find the prefix
             const matchedPrefix = prefixes.find(p => event.body.startsWith(p));
-            if (!matchedPrefix) {
-                console.error(`Received message with unrecognized prefix: ${event.body}`);
-                return;
-            }
+  
 
             // Remove prefix and trim the command body
             const commandBody = event.body.slice(matchedPrefix.length).trim();
 
             // Check if the message is asking for the prefix
-            if (event.body.toLowerCase().startsWith('prefix')) {
-                chat.reply(`The prefix of the bot is: ${JSON.stringify(prefixes)}`);
+            if (event.body.toLowerCase() === 'prefix') {
+  chat.reply(`The prefix of the bot is: ${JSON.stringify(prefixes)}`);
+  return;
+} else {
+  chat.reply("I'm sorry, but I don't have a prefix.");
                 return;
             }
 

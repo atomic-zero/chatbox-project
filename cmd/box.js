@@ -19,22 +19,22 @@ module.exports = {
 
     if (['clear', 'reset', 'forgot', 'forget']?.includes(query?.toLowerCase())) {
       conversationHistories[senderID] = [];
-      chat.reply(mono("Conversation history cleared."));
+      chat.reply(mono("Conversation history cleared."), 5000);
       return;
     }
 
     if (query === 'toggle') {
       webSearchMode = !webSearchMode;
-      chat.reply(mono(`Web search mode has been ${webSearchMode ? 'enabled' : 'disabled'}.`));
+      chat.reply(mono(`Web search mode has been ${webSearchMode ? 'enabled' : 'disabled'}.`), 5000);
       return;
     }
 
     if (!query) {
-      chat.reply(mono("Please provide a question!"));
+      chat.reply(mono("Please provide a question!", 5000));
       return;
     }
 
-    const answering = await chat.reply(mono("🕐 | Answering..."));
+     answering = await chat.reply(mono("🕐 | Answering..."));
 
     conversationHistories[senderID] = conversationHistories[senderID] || [];
     conversationHistories[senderID].push({ content: query, role: senderID });
@@ -62,8 +62,8 @@ module.exports = {
       const line = "\n" + '━'.repeat(18) + "\n";
       answering.edit(mono("◼️ BLACKBOX AI") + line + answer + line + mono(`◉ USE "CLEAR" TO RESET CONVERSATION.\n◉ USE "TOGGLE" TO SWITCH WEBSEARCH`));
     } catch (error) {
-      chat.error("Error processing request:" + error.message);
       answering.edit(mono("No response from Blackbox AI. Please try again later: " + error.message));
+      answering.unsend(5000);
     }
   }
 }

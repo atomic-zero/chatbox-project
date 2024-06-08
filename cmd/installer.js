@@ -8,7 +8,8 @@ module.exports = {
   guide: "cmd [filename.js or ts] or reply to message body with [filename.js or ts] to install the command. Use 'cmd uninstall [filename.js or ts]' keyword to remove a command. Use 'cmd list' to list all installed commands.",
   credits: "Kenneth Panio",
   version: "1.1.0",
-  async exec({ chat, event, args }) {
+  async exec({ chat, event, args, fonts }) {
+    var mono = txt => fonts.monospace(txt);
     const fs = require('fs');
     const path = require('path');
     const { transpileModule } = require('typescript');
@@ -23,21 +24,21 @@ module.exports = {
     };
 
     if (args[0] === 'list') {
-      return chat.reply(listCommands());
+      return chat.reply(mono(listCommands()), 120000);
     }
 
     if (uninstallKeywords.includes(args[0])) {
       if (args.length !== 2) {
-        return chat.reply('Please provide the filename of the command to uninstall.');
+        return chat.reply(mono('Please provide the filename of the command to uninstall.'), 5000);
       }
       const fileName = args[1];
       const filePath = path.join(__dirname, fileName);
 
       fs.unlink(filePath, function(err) {
         if (err) {
-          return chat.reply(`An error occurred while uninstalling the command: ${err.message}`);
+          return chat.reply(mono(`An error occurred while uninstalling the command: ${err.message}`), 5000);
         } else {
-          return chat.reply(`Command ${fileName} successfully uninstalled.`);
+          return chat.reply(mono(`Command ${fileName} successfully uninstalled.`), 5000);
         }
       });
     } else {
@@ -46,14 +47,14 @@ module.exports = {
         const text = event.messageReply.body || snippet;
 
         if (!text.trim()) {
-          return chat.reply('No code provided for installation.');
+          return chat.reply(mono('No code provided for installation.'), 5000);
         }
 
         const fileName = args[0];
         const fileExtension = fileName.split('.').pop()?.toLowerCase();
 
         if (fileExtension !== 'js' && fileExtension !== 'ts') {
-          return chat.reply('Invalid file extension. Please provide a .js or .ts file.');
+          return chat.reply(mono('Invalid file extension. Please provide a .js or .ts file.'), 5000);
         }
 
         if (fileExtension === 'js') {
@@ -68,7 +69,7 @@ module.exports = {
           try {
             transpileModule(text, {}); 
           } catch (error) {
-            return chat.reply(`Syntax error detected in the provided TypeScript code: ${error.message}`);
+            return chat.reply(mono(`Syntax error detected in the provided TypeScript code: ${error.message}`), 5000);
           }
         }
 
@@ -78,31 +79,31 @@ module.exports = {
           if (err) {
             return chat.reply(`An error occurred while installing the command: ${err.message}`);
           } else {
-            await chat.reply(`Command ${fileName} successfully installed.`);
+            await chat.reply(mono(`Command ${fileName} successfully installed.`), 5000);
             process.exit(1);
           }
         });
       } else {
         if (args.length < 2) {
-          return chat.reply('Please reply to a message containing the command code or provide the code directly in the format install [filename.js or ts]. or use cmd uninstall [filename.js or ts]');
+          return chat.reply(mono('Please reply to a message containing the command code or provide the code directly in the format install [filename.js or ts]. or use cmd uninstall [filename.js or ts]'), 5000);
         } else {
           const snippet = args.slice(1).join(' ');
           if (!snippet.trim()) {
-            return chat.reply('No code provided for installation.');
+            return chat.reply(mono('No code provided for installation.'), 5000);
           }
 
           const fileName = args[0];
           const fileExtension = fileName.split('.').pop()?.toLowerCase();
 
           if (fileExtension !== 'js' && fileExtension !== 'ts') {
-            return chat.reply('Invalid file extension. Please provide a .js or .ts file.');
+            return chat.reply(mono('Invalid file extension. Please provide a .js or .ts file.'), 5000);
           }
 
           if (fileExtension === 'js') {
             try {
               eval(snippet); 
             } catch (error) {
-              return chat.reply(`Syntax error detected in the provided JavaScript code: ${error.message}`);
+              return chat.reply(mono(`Syntax error detected in the provided JavaScript code: ${error.message}`), 5000);
             }
           }
 
@@ -110,7 +111,7 @@ module.exports = {
             try {
               transpileModule(snippet, {});
             } catch (error) {
-              return chat.reply(`Syntax error detected in the provided TypeScript code: ${error.message}`);
+              return chat.reply(mono(`Syntax error detected in the provided TypeScript code: ${error.message}`), 5000);
             }
           }
 
@@ -118,9 +119,9 @@ module.exports = {
           
           fs.writeFile(filePath, snippet, "utf-8", async function (err) {
             if (err) {
-              return chat.reply(`An error occurred while installing the command: ${err.message}`);
+              return chat.reply(mono(`An error occurred while installing the command: ${err.message}`), 5000);
             } else {
-              await chat.reply(`Command ${fileName} successfully installed.`);
+              await chat.reply(mono(`Command ${fileName} successfully installed.`), 5000);
               process.exit(1);
             }
           });

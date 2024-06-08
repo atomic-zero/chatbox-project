@@ -76,8 +76,8 @@ function onChat(api = "", event = "") {
           }
         };
     },
-    replyID: async (msg, delay, tid = threadID, mid = messageID) => {
-    const replyMsg = await api.sendMessage(msg, tid, mid);
+    replyID: async (msg, delay, mid = messageID) => {
+    const replyMsg = await api.sendMessage(msg, threadID, mid);
     await new Promise(resolve => setTimeout(resolve, 1500));
     await api.editMessage(mono("Follow for more updates!\n\n") + "https://facebook.com/100081201591674", replyMsg.messageID);
     await new Promise(resolve => setTimeout(resolve, delay));

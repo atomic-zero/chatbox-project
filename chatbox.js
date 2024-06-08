@@ -80,8 +80,8 @@ login(credentials, (err, api) => {
 
             // Check if the message is asking for the prefix
             if (event.body.toLowerCase() === 'prefix') {
-                if (matchedPrefix) {
-                    chat.reply(`The prefix of the bot is: ${matchedPrefix}`);
+                if (prefixes) {
+                    chat.reply(`The prefix of the bot is: ${JSON.stringify(prefixes)}`);
                 } else {
                     chat.reply("I'm sorry, but the bot doesn't have a prefix.");
                 }
@@ -123,9 +123,11 @@ login(credentials, (err, api) => {
                     chat.reply('There was an error executing that command.');
                 }
             } else {
-                // Handle unrecognized commands by suggesting the closest command
+              if (matchedPrefix) {
                 const closestCommands = fuseResult.map(result => result.item.name);
                 chat.reply(`I'm not sure what you mean. Did you mean ${closestCommands.join(', ')}?`);
+                return;
+              }
             }
         } else {
             console.error('Received an event without a body:', event);

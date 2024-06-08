@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const login = require('./fca/index.js');
 const { onChat, fonts }  = require('./system/chat');
-var mono = txt => fons.monospace(txt);
+var mono = txt => fonts.monospace(txt);
 const tsNode = require('ts-node');
 const Fuse = require('fuse.js');
 

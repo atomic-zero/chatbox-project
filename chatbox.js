@@ -77,19 +77,19 @@ login(credentials, (err, api) => {
 
             // Find the prefix
             const matchedPrefix = prefixes.find(p => event.body.startsWith(p));
-  
-
-            // Remove prefix and trim the command body
-            const commandBody = event.body.slice(matchedPrefix.length).trim();
 
             // Check if the message is asking for the prefix
             if (event.body.toLowerCase() === 'prefix') {
-  chat.reply(`The prefix of the bot is: ${JSON.stringify(prefixes)}`);
-  return;
-} else {
-  chat.reply("I'm sorry, but I don't have a prefix.");
+                if (matchedPrefix) {
+                    chat.reply(`The prefix of the bot is: ${matchedPrefix}`);
+                } else {
+                    chat.reply("I'm sorry, but the bot doesn't have a prefix.");
+                }
                 return;
             }
+
+            // Remove prefix and trim the command body
+            const commandBody = matchedPrefix ? event.body.slice(matchedPrefix.length).trim() : event.body.trim();
 
             // Search for command
             const fuseResult = fuse.search(commandBody);
@@ -99,7 +99,7 @@ login(credentials, (err, api) => {
 
                 // Check if the command supports prefixes
                 const prefixEnabled = command.isPrefix !== undefined ? command.isPrefix : defaultPrefixEnabled;
-                if (!prefixEnabled) {
+                if (!prefixEnabled && matchedPrefix) {
                     console.error(`Command ${command.name} does not support prefixes.`);
                     return;
                 }

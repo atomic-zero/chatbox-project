@@ -1,25 +1,25 @@
-const { loadSessions, startSession, activeSessions } = require('./system/manager');
+const { spawn } = require("child_process");
+const path = require('path');
+const SCRIPT_FILE = "./main.js";
+const SCRIPT_PATH = path.join(__dirname, SCRIPT_FILE);
 
-loadSessions();
+function start() {
+  const main = spawn("node", [SCRIPT_PATH], {
+    cwd: __dirname,
+    stdio: "inherit",
+    shell: true
+  });
 
-process.on('exit', () => {
-  activeSessions = 0;
-});
+  main.on("close", (exitCode) => {
+    if (exitCode === 0) {
+      console.log("[0] - Process Existed!");
+    } else if (exitCode === 1) {
+      console.log("[1] - System Rebooting!....");
+      start();
+    } else {
+      console.error(`[${exitCode}] - Process Existed!`);
+    }
+  });
+}
 
-process.on('SIGINT', () => {
-  activeSessions = 0;
-  process.exit();
-});
-
-process.on('SIGTERM', () => {
-  activeSessions = 0;
-  process.exit();
-});
-
-process.on("unhandledRejection", reason => {
-  console.error('Unhandled Rejection:', reason);
-});
-
-process.on("uncaughtException", reason => {
-  console.error('Uncaught Exception:', reason);
-});
+start();

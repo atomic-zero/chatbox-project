@@ -6,7 +6,7 @@ const { startSession, activeSessions } = require('./system/manager');
 
 const app = express();
 app.use(bodyParser.json());
-const port = 3000;
+const port = 8237;
 
 app.post('/submit-appstate', (req, res) => {
   const { appState } = req.body;

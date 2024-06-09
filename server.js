@@ -46,6 +46,10 @@ app.post('/set-prefixes', (req, res) => {
   }
 });
 
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/control-panel.html');
+});
+
 app.get('/active-sessions', (req, res) => {
   res.json({ activeSessions });
 });

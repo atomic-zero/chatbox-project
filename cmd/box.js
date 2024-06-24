@@ -1,71 +1,74 @@
-const axios = require("axios");
+const { chatbox, toggle, clear } = require('chatbox-dev-ai');
+const fs = require('fs');
+const path = require('path');
 
-let conversationHistories = {};
-let webSearchMode = false;
+module.exports["config"] = {
+    name: "chatbox",
+    aliases: ["chatterbox"],
+    version: "1.0.0",
+    credits: "Kenneth Panio",
+    role: 0,
+    type: "artificial-intelligence",
+    info: "Interact with chatterbox AI. Use 'box toggle' to toggle web search mode.",
+    usage: "[prompt]",
+    guide: "chatbox How does nuclear fusion work?",
+    cd: 6
+};
 
-module.exports = {
-  name: "box",
-  aliases: ["bb", "blackbox", "blackbox-ai"],
-  version: "1.0.0",
-  isPrefix: false,
-  credits: "Kenneth Panio",
-  type: "artificial-intelligence",
-  info: "Interact with Blackbox AI. Use 'box toggle' to toggle web search mode.",
-  usage: "[prompt]",
-  guide: "blackbox How does nuclear fusion work?",
-  cd: 6,
-  exec: async ({ chat, args, event, fonts }) => {
+module.exports["exec"] = async ({ chat, args, event, fonts }) => {
     const mono = txt => fonts.monospace(txt);
-    const { threadID, senderID } = event;
+    const { senderID } = event;
     const query = args.join(" ");
 
     if (['clear', 'reset', 'forgot', 'forget'].includes(query.toLowerCase())) {
-      conversationHistories[senderID] = [];
-      chat.reply(mono("Conversation history cleared."));
-      return;
+        const clearResult = await clear(senderID);
+        return chat.reply(mono(clearResult));
     }
 
     if (query === 'toggle') {
-      webSearchMode = !webSearchMode;
-      chat.reply(mono(`Web search mode has been ${webSearchMode ? 'enabled' : 'disabled'}.`));
-      return;
+        const message = await toggle();
+        return chat.reply(mono(message));
     }
 
     if (!query) {
-      chat.reply(mono("Please provide a question!"));
-      return;
+        chat.reply(mono("Please provide a question!"));
+        return;
     }
 
     const answering = await chat.reply(mono("🕐 | Answering..."));
 
-    conversationHistories[senderID] = conversationHistories[senderID] || [];
-    conversationHistories[senderID].push({ content: query, role: senderID });
-
     try {
-      const response = await axios.post("https://www.blackbox.ai/api/chat", {
-        messages: conversationHistories[senderID],
-        id: senderID,
-        previewToken: null,
-        userId: senderID,
-        codeModelMode: true,
-        agentMode: [],
-        trendingAgentMode: [],
-        isMicMode: false,
-        isChromeExt: false,
-        githubToken: null,
-        webSearchMode,
-        maxTokens: '10240'
-      });
+        const response = await chatbox(senderID, query);
+        let answer = response;
 
-      const answer = response.data.replace(/\$@\$(.*?)\$@\$/g, '') || mono("I don't understand could you please rephrase that!");
+        // Replace double asterisks with bold text
+        answer = answer.replace(/\*\*(.*?)\*\*/g, (_, text) => fonts.bold(text));
 
-      conversationHistories[senderID].push({ content: answer, role: "assistant" });
+        const codeBlocks = answer.match(/```[\s\S]*?```/g) || [];
+        const line = "\n" + '━'.repeat(18) + "\n";
+        const message = fonts.bold("📦 | CHATBOX DEV AI") + line + answer + line + mono(`◉ USE "CLEAR" TO RESET CONVERSATION.\n◉ USE "TOGGLE" TO SWITCH WEBSEARCH`);
 
-      const line = "\n" + '━'.repeat(18) + "\n";
-      answering.edit(mono("◼️ BLACKBOX AI") + line + answer + line + mono(`◉ USE "CLEAR" TO RESET CONVERSATION.\n◉ USE "TOGGLE" TO SWITCH WEBSEARCH`));
+        await answering.edit(message);
+
+        if (codeBlocks.length > 0) {
+            const allCode = codeBlocks.map(block => block.replace(/```/g, '').trim()).join('\n\n\n');
+            const cacheFolderPath = path.join(__dirname, "cache");
+
+            if (!fs.existsSync(cacheFolderPath)) {
+                fs.mkdirSync(cacheFolderPath);
+            }
+
+            const uniqueFileName = `code_snippet_${Math.floor(Math.random() * 1e6)}.txt`;
+            const filePath = path.join(cacheFolderPath, uniqueFileName);
+
+            fs.writeFileSync(filePath, allCode, 'utf8');
+
+            const fileStream = fs.createReadStream(filePath);
+            await chat.reply({ attachment: fileStream });
+
+            fs.unlinkSync(filePath);
+        }
     } catch (error) {
-      answering.edit(mono("No response from Blackbox AI. Please try again later: " + error.message));
-      answering.unsend(5000);
+        await answering.edit(mono("No response from Chatbox AI. Please try again later: " + error.message));
     }
-  }
-}
+};

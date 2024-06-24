@@ -1,5 +1,7 @@
 
-const text = require("fontstyles");
+const text = require("fontsstyles");
+const { rainbow } = require("gradient-string");
+const { red } = require("chalk");
 
 const fonts = {
   italic: msg => text.italic(msg),
@@ -15,6 +17,30 @@ const fonts = {
 };
 
 const mono = txt => fonts.monospace(txt);
+
+const global = {
+  api: {
+    "1secmail": "https://www.1secmail.com/api/v1",
+    "chatbox": "https://www.blackbox.ai/api/chat",
+    "august": "https://openapi-idk8.onrender.com",
+    "deku": "https://joshweb.click",
+    "kenlie": "https://api.kenliejugarap.com",
+    "openai": "https://api.openai.com",
+    "hashier": "https://ai-1stclass-nemory-project.vercel.app",
+    "jarif": "https://www.api.vyturex.com",
+    "atomic": "soon",
+    "local": "http://localhost:8216"
+  },
+  key: {
+    "fbtoken": "soon",
+  },
+  design: {
+    line: '━'.repeat(18),
+    author: mono("Kenneth Panio"),
+    date: "soon",
+  }
+}
+
 
 function onChat(api = "", event = "") {
   const { threadID, messageID, senderID, body = "" } = event;
@@ -42,7 +68,7 @@ function onChat(api = "", event = "") {
   const reactionTypeV2 = reactionsV2[randomizeV2];
   
   
-  const chat = {
+    const chat = {
     react: (emoji = "❓", mid = messageID) => api.setMessageReaction(emoji, mid, () => {}, true),
     postReact: (post = "305153548868029", type = reactionType) => api.setPostReaction(post, type),
     storyReact: (story, react = reactionTypeV2) => api.setStoryReaction(story, react),
@@ -55,12 +81,10 @@ function onChat(api = "", event = "") {
     uid: (link) => api.getUID(link),
     reply: async (msg, tid = threadID) => {
         const replyMsg = await api.sendMessage(msg, tid);
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        await api.editMessage(mono("Follow for more updates!\n\n") + "https://facebook.com/100081201591674", replyMsg.messageID);
         const selfReact = api.setMessageReaction(selfEmoji, replyMsg.messageID, () => {}, true);
         const senderReact = api.setMessageReaction(senderEmoji, messageID, () => {}, true);
           return {
-          edit: async (message, delay = 3000) => {
+          edit: async (message, delay = 0) => {
               await new Promise(resolve => setTimeout(resolve, delay));
               await api.editMessage(message, replyMsg.messageID);
           },
@@ -72,13 +96,11 @@ function onChat(api = "", event = "") {
     },
     replyID: async (msg, mid = messageID) => {
     const replyMsg = await api.sendMessage(msg, threadID, mid);
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    await api.editMessage(mono("Follow for more updates!\n\n") + "https://facebook.com/100081201591674", replyMsg.messageID);
     const selfReact = api.setMessageReaction(selfEmoji, replyMsg.messageID, () => {}, true);
     const senderReact = api.setMessageReaction(senderEmoji, messageID, () => {}, true);
     return {
-      edit: async (message, delay = 3000) => {
-                await new Promise(resolve => setTimeout(resolve, delay));
+      edit: async (message, delay = 0) => {
+          await new Promise(resolve => setTimeout(resolve, delay));
           await api.editMessage(message, replyMsg.messageID);
       },
       unsend: async (delay = 0) => {
@@ -113,13 +135,15 @@ function onChat(api = "", event = "") {
     acceptfr: (id = senderID) => api.handleFriendRequest(id, true),
     unfriend: (id = senderID) => api.handleFriendRequest(id, false),
     threadInfo: (tid = threadID) => api.getThreadInfo(tid),
-    threadList: () => api.getThreadList(100, null, ["INBOX"])
+    threadList: (total = 25, type = "INBOX") => api.getThreadList(total, null, [type]),
+    log: txt => console.log(rainbow(txt)),
+    error: txt => console.error(red(JSON.stringify(txt)))
   };
-  
   return chat;
 }
 
 module.exports = {
+  global,
   onChat,
   fonts
 };

@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const login = require('./system/fca/index.js');
+const login = require('chatbox-fca-utils');
 const { onChat, fonts } = require('./system/chat');
 const tsNode = require('ts-node');
 const Fuse = require('fuse.js');
